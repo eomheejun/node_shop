@@ -6,10 +6,16 @@ router.get('/', (req, res) => {
         message: '데이터 겟 성공'
     });
 });
-
+//data 생성
 router.post('/', (req, res) =>{
+    const product = {
+        name: req.body.name,
+        price: req.body.price
+    };
+
     res.status(201).json({
-        msg:'데이터 포스팅 성공'
+        msg:'데이터 포스팅 성공',
+        createdproduct: product
     });        
 });
 
