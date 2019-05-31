@@ -1,22 +1,56 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+
+const productModel = require("../models/products");
 
 router.get('/', (req, res) => {
-    res.status(200).json({
-        message: '데이터 겟 성공'
-    });
+    productModel
+        .find()
+        .then(docs => {
+            console.log(docs);
+            res.status(200).json(docs);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+
+
+    // res.status(200).json({
+    //     message: '데이터 겟 성공'
+    // });
 });
 //data 생성
 router.post('/', (req, res) =>{
-    const product = {
+    const product = new productModel ({
+        _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price
-    };
+    });
 
-    res.status(201).json({
-        msg:'데이터 포스팅 성공',
-        createdproduct: product
-    });        
+    product
+        .save()
+        .then(result => {
+            console.log(result);
+            res.status(201).json({
+                msg: 'successful post',
+                createdProduct: result
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+
+    // res.status(201).json({
+    //     msg:'데이터 포스팅 성공',
+    //     createdproduct: product
+    // });        
 });
 
 router.patch('/:productId', (req, res) =>{
