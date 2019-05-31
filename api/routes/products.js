@@ -55,46 +55,99 @@ router.post('/', (req, res) =>{
 
 router.patch('/:productId', (req, res) =>{
     const id=req.params.productId;
-
-    if(id==='1234'){
-        res.status(200).json({
-            msg:'데이터 수정'
-        });
-    }else{
-        res.status(200).json({
-            msg:'id 찾을수 없음'
-        });
+    const updateOps = {};
+    for(const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
     }
+
+    productModel
+        .update({_id:id}, {$set:updateOps})
+        .exec()
+        .then(result => {
+            console.log(result);
+            res.status(200).json(result);
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+
+    // if(id==='1234'){
+    //     res.status(200).json({
+    //         msg:'데이터 수정'
+    //     });
+    // }else{
+    //     res.status(200).json({
+    //         msg:'id 찾을수 없음'
+    //     });
+    // }
 });
 
 router.delete('/:productId', (req, res) =>{
-    const id=req.params.productId;
 
-    if(id==='0000'){
-        res.status(200).json({
-            msg:'데이터 삭제'
+    const id = req.params.productId;
+    productModel
+        .remove({_id: id})
+        .exec()
+        .then(result =>{
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
         });
 
-    }else{
-        res.status(200).json({
-            msg:'id를 찾을수 없음'
-        });
-    }
+    // const id=req.params.productId;
+
+    // if(id==='0000'){
+    //     res.status(200).json({
+    //         msg:'데이터 삭제'
+    //     });
+
+    // }else{
+    //     res.status(200).json({
+    //         msg:'id를 찾을수 없음'
+    //     });
+    // }
 });
 
 router.get('/:productId', (req ,res) => {
     const id = req.params.productId;
 
-    if(id === 'special'){
-        res.status(200).json({
-            msg:'너는 스페셜id를 발견했다',
-            id: id
-        });
-    }else{
-        res.status(200).json({
-            msg:'Id 없음'
+    productModel
+        .findById(id)
+        .exec()
+        .then(doc => {
+            if(doc){
+                res.status(200).json(doc);
+            } else {
+                res.status(404).json({
+                    msg:"Id를 찾을수 없음"
+                });
+            }
         })
-    }
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json({
+                error:err
+            });
+        });
+
+
+    // if(id === 'special'){
+    //     res.status(200).json({
+    //         msg:'너는 스페셜id를 발견했다',
+    //         id: id
+    //     });
+    // }else{
+    //     res.status(200).json({
+    //         msg:'Id 없음'
+    //     })
+    // }
 });
 
 
