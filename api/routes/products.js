@@ -8,8 +8,21 @@ router.get('/', (req, res) => {
     productModel
         .find()
         .then(docs => {
-            console.log(docs);
-            res.status(200).json(docs);
+            const response = {
+                count: docs.length,
+                products: docs.map(doc => {
+                    return{
+                        name:doc.name,
+                        price:doc.price,
+                        _id:doc._id,
+                        request:{
+                            type:"GET",
+                            url:"http://localhost:3000/products/"+ doc._id
+                        }
+                    };
+                })
+            };
+            res.status(200).json(response);
         })
         .catch(err => {
             console.log(err);
@@ -34,10 +47,18 @@ router.post('/', (req, res) =>{
     product
         .save()
         .then(result => {
-            console.log(result);
+
             res.status(201).json({
-                msg: 'successful post',
-                createdProduct: result
+                msg:"successful post",
+                createdProduct: {
+                    name:result.name,
+                    price:result.price,
+                    _id:result._id,
+                    request:{
+                        type:"GET",
+                        url: "http://localhost:3000/products/" + result._id
+                    }
+                }
             });
         })
         .catch(err => {
@@ -64,8 +85,13 @@ router.patch('/:productId', (req, res) =>{
         .update({_id:id}, {$set:updateOps})
         .exec()
         .then(result => {
-            console.log(result);
-            res.status(200).json(result);
+            res.status(200).json({
+                msg:'product updated',
+                request:{
+                    tupe:"GET",
+                    url:'http://localhost:3000/products/'+id
+                }
+            })
         })
         .catch(err=>{
             console.log(err);
@@ -92,7 +118,14 @@ router.delete('/:productId', (req, res) =>{
         .remove({_id: id})
         .exec()
         .then(result =>{
-            res.status(200).json(result);
+            res.status(200).json({
+                msg:'product deleted',
+                request:{
+                    type:'POST',
+                    url:'http://localhost:3000/products',
+                    body:{name:'String', price:'String'}
+                }
+            });
         })
         .catch(err => {
             console.log(err);
@@ -123,7 +156,13 @@ router.get('/:productId', (req ,res) => {
         .exec()
         .then(doc => {
             if(doc){
-                res.status(200).json(doc);
+                res.status(200).json({
+                    product:doc,
+                    request: {
+                        type:"GET",
+                        url:'http://localhost:3000/products'
+                    }
+                });
             } else {
                 res.status(404).json({
                     msg:"Id를 찾을수 없음"
