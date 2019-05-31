@@ -3,9 +3,16 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const mongoose = require("mongoose");
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+
+const db = "mongodb+srv://eomheejun:joon9759@cluster0-pukro.mongodb.net/test?retryWrites=true&w=majority";
+
+mongoose.connect(db, {useNewUrlParser:true})
+    .then( () => console.log("MongoDB Connected..."))
+    .catch(err => console.log(err));
 
 
 
